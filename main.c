@@ -1,12 +1,11 @@
 #include "shell.h"
-
-extern char **environ;
-
 /**
  * main - Simple UNIX command line interpreter (0.1)
  *
  * Return: Always 0 (Success)
  */
+extern char **environ;
+
 int main(void)
 {
 	char *line = NULL;
@@ -17,13 +16,16 @@ int main(void)
 
 	while (1)
 	{
-		write(STDOUT_FILENO, "#cisfun$ ", 9);
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, "#cisfun$ ", 9);
+
 		read = getline(&line, &len, stdin);
 
 		if (read == -1)
 		{
 			free(line);
-			write(STDOUT_FILENO, "\n", 1);
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
 			return (0);
 		}
 
@@ -37,6 +39,7 @@ int main(void)
 			free(line);
 			exit(EXIT_FAILURE);
 		}
+
 		if (pid == 0)
 		{
 			argv[0] = line;
