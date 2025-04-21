@@ -1,0 +1,46 @@
+.TH hsh 1 "April 2025" "Simple Shell Manual" "User Commands"
+.SH NAME
+hsh \- simple shell interpreter
+.SH SYNOPSIS
+.B hsh
+.SH DESCRIPTION
+.B hsh
+is a simple UNIX command interpreter written in C.
+
+It reads commands from the standard input and executes them. It behaves like the standard shell `/bin/sh`.
+
+This shell supports both interactive and non-interactive modes.
+
+.SH FEATURES
+.TP
+\fB*\fR Displays a prompt and waits for user input (interactive mode)
+.TP
+\fB*\fR Executes commands with arguments (e.g. \fBls -l\fR)
+.TP
+\fB*\fR Works in non-interactive mode (e.g. \fBecho "ls" \| ./hsh\fR)
+.TP
+\fB*\fR Parses the PATH environment variable to locate executables
+.TP
+\fB*\fR Handles errors and prints messages similar to /bin/sh
+.TP
+\fB*\fR Built-in commands like \fBexit\fR
+
+.SH USAGE
+To start the shell, simply run:
+.B ./hsh
+
+Then you can type commands:
+.EX
+$ ls -l
+$ /bin/echo Hello
+$ exit
+.EE
+
+.SH RETURN VALUE
+Returns 0 on success, or another number in case of failure.
+
+.SH AUTHORS
+Mohammed Alahmari <maado321@gmail.com>  
+Yaser Alelayan <10711@holbertonstudents.com>
+
+See the AUTHORS file in the repository for more contributors.
