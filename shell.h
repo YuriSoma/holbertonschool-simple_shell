@@ -6,5 +6,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 
-#endif
+char *trim_whitespace(char *str);
+
+#endif /* SHELL_H */
