@@ -4,11 +4,12 @@ extern char **environ;
 
 int main(void)
 {
-	char *line = NULL;
+	char *line = NULL, *trimmed_line, *token;
+	char *argv[64];
 	size_t len = 0;
 	ssize_t read;
 	pid_t pid;
-	char *argv[2], *command;
+	int i;
 
 	while (1)
 	{
@@ -27,8 +28,20 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		command = trim_whitespace(line);
-		if (command[0] == '\0')
+		trimmed_line = trim_whitespace(line);
+		if (trimmed_line[0] == '\0')
+			continue;
+
+		i = 0;
+		token = strtok(trimmed_line, " \t");
+		while (token != NULL && i < 63)
+		{
+			argv[i++] = token;
+			token = strtok(NULL, " \t");
+		}
+		argv[i] = NULL;
+
+		if (argv[0] == NULL)
 			continue;
 
 		pid = fork();
@@ -41,8 +54,6 @@ int main(void)
 
 		if (pid == 0)
 		{
-			argv[0] = command;
-			argv[1] = NULL;
 			if (execve(argv[0], argv, environ) == -1)
 			{
 				perror("./hsh");
