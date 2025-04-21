@@ -9,5 +9,6 @@
 #include <string.h>
 
 char *trim_whitespace(char *str);
+char *find_path(char *command);
 
-#endif /* SHELL_H */
+#endif
