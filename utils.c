@@ -18,43 +18,55 @@ char *trim_whitespace(char *str)
 	return str;
 }
 
+char *get_path_env(void)
+{
+	int i = 0;
+
+	while (environ[i])
+	{
+		if (environ[i][0] == 'P' && environ[i][1] == 'A' &&
+		    environ[i][2] == 'T' && environ[i][3] == 'H' &&
+		    environ[i][4] == '=')
+		{
+			return (environ[i] + 5);
+		}
+		i++;
+	}
+	return (NULL);
+}
+
 char *find_path(char *command)
 {
-	char *path = getenv("PATH");
-	char *path_copy, *token, *full_path;
-	size_t len;
+	char *path = get_path_env();
+	char full_path[1024];
+	char *token, *ptr;
+	int len;
 
-	if (command == NULL || path == NULL)
-		return NULL;
+	if (!command)
+		return (NULL);
 
 	if (access(command, X_OK) == 0)
-		return strdup(command);
+		return (strdup(command));
 
-	path_copy = strdup(path);
-	token = strtok(path_copy, ":");
+	if (!path)
+		return (NULL);
 
-	while (token != NULL)
+	ptr = path;
+	while (*ptr)
 	{
-		len = strlen(token) + strlen(command) + 2;
-		full_path = malloc(len);
-		if (full_path == NULL)
-		{
-			free(path_copy);
-			return NULL;
-		}
+		token = ptr;
+		while (*ptr && *ptr != ':')
+			ptr++;
 
-		snprintf(full_path, len, "%s/%s", token, command);
+		len = ptr - token;
+		snprintf(full_path, sizeof(full_path), "%.*s/%s", len, token, command);
 
 		if (access(full_path, X_OK) == 0)
-		{
-			free(path_copy);
-			return full_path;
-		}
+			return (strdup(full_path));
 
-		free(full_path);
-		token = strtok(NULL, ":");
+		if (!*ptr)
+			break;
+		ptr++;
 	}
-
-	free(path_copy);
-	return NULL;
+	return (NULL);
 }
