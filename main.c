@@ -1,5 +1,3 @@
-#include "shell.h"
-
 int main(void)
 {
 	char *line = NULL, *trimmed, *token, *full_cmd;
@@ -7,7 +5,7 @@ int main(void)
 	ssize_t read;
 	pid_t pid;
 	char *argv[64];
-	int i;
+	int i, status, last_status = 0;
 
 	while (1)
 	{
@@ -20,7 +18,7 @@ int main(void)
 			free(line);
 			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
-			return (0);
+			return (last_status);
 		}
 
 		if (line[read - 1] == '\n')
@@ -33,25 +31,21 @@ int main(void)
 		i = 0;
 		token = strtok(trimmed, " \t");
 		while (token != NULL && i < 63)
-		{
-			argv[i++] = token;
-			token = strtok(NULL, " \t");
-		}
+			argv[i++] = token, token = strtok(NULL, " \t");
 		argv[i] = NULL;
 
 		full_cmd = find_path(argv[0]);
 		if (full_cmd == NULL)
 		{
-			perror("./hsh");
+			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+			last_status = 127;
 			continue;
 		}
 
 		pid = fork();
 		if (pid == -1)
 		{
-			perror("fork");
-			free(line);
-			free(full_cmd);
+			perror("fork"), free(line), free(full_cmd);
 			exit(EXIT_FAILURE);
 		}
 
@@ -59,17 +53,17 @@ int main(void)
 		{
 			if (execve(full_cmd, argv, environ) == -1)
 			{
-				perror("./hsh");
-				free(full_cmd);
+				perror("./hsh"), free(full_cmd);
 				exit(EXIT_FAILURE);
 			}
 		}
 		else
 		{
-			wait(NULL);
+			wait(&status);
+			last_status = WEXITSTATUS(status);
 			free(full_cmd);
 		}
 	}
 	free(line);
-	return (0);
+	return (last_status);
 }
