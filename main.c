@@ -1,7 +1,5 @@
 #include "shell.h"
 
-extern char **environ;
-
 int main(void)
 {
 	char *line = NULL, *trimmed, *token, *full_cmd;
