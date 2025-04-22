@@ -1,3 +1,4 @@
+#include "shell.h"
 int main(void)
 {
 	char *line = NULL, *trimmed, *token, *full_cmd;
