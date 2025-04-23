@@ -1,4 +1,10 @@
 #include "shell.h"
+
+/**
+ * main - simple shell loop
+ *
+ * Return: exit status
+ */
 int main(void)
 {
 	char *line = NULL, *trimmed, *token, *full_cmd;
@@ -6,7 +12,7 @@ int main(void)
 	ssize_t read;
 	pid_t pid;
 	char *argv[64];
-	int i, status, last_status = 0;
+	int i, status, last_status = 0, builtin_result;
 
 	while (1)
 	{
@@ -34,6 +40,12 @@ int main(void)
 		while (token != NULL && i < 63)
 			argv[i++] = token, token = strtok(NULL, " \t");
 		argv[i] = NULL;
+
+		builtin_result = handle_builtins(argv);
+		if (builtin_result == 1)
+			break;
+		if (builtin_result == 2)
+			continue;
 
 		full_cmd = find_path(argv[0]);
 		if (full_cmd == NULL)
