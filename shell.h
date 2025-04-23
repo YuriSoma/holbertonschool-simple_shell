@@ -13,5 +13,6 @@ extern char **environ;
 char *trim_whitespace(char *str);
 char *find_path(char *command);
 char *get_path_env(void);
+int handle_builtins(char **argv);
 
 #endif
