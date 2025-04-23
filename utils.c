@@ -1,72 +1,30 @@
 #include "shell.h"
 
-char *trim_whitespace(char *str)
+/**
+ * handle_builtins - handles built-in commands (exit, env)
+ * @argv: array of arguments
+ *
+ * Return: 1 for exit, 2 for env, 0 otherwise
+ */
+int handle_builtins(char **argv)
 {
-	char *end;
+	int i;
 
-	while (*str == ' ' || *str == '\t' || *str == '\n')
-		str++;
+	if (argv[0] == NULL)
+		return (0);
 
-	if (*str == '\0')
-		return str;
+	if (strcmp(argv[0], "exit") == 0)
+		return (1);
 
-	end = str + strlen(str) - 1;
-	while (end > str && (*end == ' ' || *end == '\t'))
-		end--;
-
-	*(end + 1) = '\0';
-	return str;
-}
-
-char *get_path_env(void)
-{
-	int i = 0;
-
-	while (environ[i])
+	if (strcmp(argv[0], "env") == 0)
 	{
-		if (environ[i][0] == 'P' && environ[i][1] == 'A' &&
-		    environ[i][2] == 'T' && environ[i][3] == 'H' &&
-		    environ[i][4] == '=')
+		for (i = 0; environ[i] != NULL; i++)
 		{
-			return (environ[i] + 5);
+			write(STDOUT_FILENO, environ[i], strlen(environ[i]));
+			write(STDOUT_FILENO, "\n", 1);
 		}
-		i++;
+		return (2);
 	}
-	return (NULL);
-}
 
-char *find_path(char *command)
-{
-	char *path = get_path_env();
-	char full_path[1024];
-	char *token, *ptr;
-	int len;
-
-	if (!command)
-		return (NULL);
-
-	if (access(command, X_OK) == 0)
-		return (strdup(command));
-
-	if (!path)
-		return (NULL);
-
-	ptr = path;
-	while (*ptr)
-	{
-		token = ptr;
-		while (*ptr && *ptr != ':')
-			ptr++;
-
-		len = ptr - token;
-		snprintf(full_path, sizeof(full_path), "%.*s/%s", len, token, command);
-
-		if (access(full_path, X_OK) == 0)
-			return (strdup(full_path));
-
-		if (!*ptr)
-			break;
-		ptr++;
-	}
-	return (NULL);
+	return (0);
 }
